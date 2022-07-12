@@ -10,15 +10,15 @@ CREATE TABLE author
 (
   id SERIAL PRIMARY KEY,
   firstname VARCHAR(64) NOT NULL,
-  secondname VARCHAR(64) NOT NULL,
+  lastname VARCHAR(64) NOT NULL,
   birthdate DATE NOT NULL
 );
 
 CREATE TABLE book
 (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(64) NOT NULL,
-  year DATE NOT NULL
+  title VARCHAR(64) NOT NULL,
+  release_date DATE NOT NULL
 );
 
 CREATE TABLE book_copy
