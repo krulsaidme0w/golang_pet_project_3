@@ -1,4 +1,4 @@
-package scripts
+package security
 
 import (
 	"crypto/sha256"

@@ -1,4 +1,4 @@
-package scripts
+package storage
 
 import (
 	"database/sql"
@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/bxcodec/faker/v3"
+
+	"krulsaidme0w/library/internal/pkg/security"
 )
 
 const (
@@ -61,8 +63,8 @@ func fillUsersBulkLoad(db *sql.DB, count int) error {
 	for i := 0; i < count; i++ {
 		username := faker.Username()
 		email := faker.Email()
-		password := Hash(faker.Password())
-		id := Hash(email)
+		password := security.Hash(faker.Password())
+		id := security.Hash(email)
 
 		values = append(values, fmt.Sprintf("('%s', '%s', '%s', '%s')", id, username, email, password))
 	}

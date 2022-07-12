@@ -7,7 +7,7 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"krulsaidme0w/library/pkg/scripts"
+	"krulsaidme0w/library/internal/pkg/storage"
 )
 
 const (
@@ -25,7 +25,7 @@ func main() {
 
 	db.SetMaxOpenConns(maxOpenConns)
 
-	err = scripts.FillLibraryDB(db, count)
+	err = storage.FillLibraryDB(db, count)
 	if err != nil {
 		log.Fatal(err)
 	}
