@@ -161,3 +161,6 @@ issues:
 
   # Show only new issues created after git revision `REV`
   new-from-rev: origin/main
+linters:
+  disable:
+    - gofumpt

@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	count = 1000000
+	count        = 1000000
+	maxOpenConns = 1000
 )
 
 func main() {
@@ -20,10 +21,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.SetMaxOpenConns(1000)
 	defer db.Close()
 
-	err = scripts.FillLibraryDB(db, 1000000)
+	db.SetMaxOpenConns(maxOpenConns)
+
+	err = scripts.FillLibraryDB(db, count)
 	if err != nil {
 		log.Fatal(err)
 	}
