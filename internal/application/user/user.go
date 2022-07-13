@@ -1,13 +1,13 @@
-package application
+package user
 
 import "krulsaidme0w/library/internal/domain/repository"
 
-type User struct {
+type Service struct {
 	repository repository.User
 }
 
-func NewUserApplication(repository repository.User) *User {
-	return &User{
+func NewUserService(repository repository.User) *Service {
+	return &Service{
 		repository: repository,
 	}
 }
