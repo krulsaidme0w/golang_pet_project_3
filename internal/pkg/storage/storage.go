@@ -1,20 +1,25 @@
 package storage
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
+	"math/rand"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/bxcodec/faker/v3"
+	"golang.org/x/sync/errgroup"
 
 	"krulsaidme0w/library/internal/pkg/security"
 )
 
 const (
-	tablesCount = 3
+	baseDateFormat        = "2006-01-02"
+	tablesCount           = 6
+	tablesWithForeignKeys = 3
 )
 
 func FillLibraryDB(db *sql.DB, count int) error {
@@ -22,33 +27,37 @@ func FillLibraryDB(db *sql.DB, count int) error {
 
 	wg := &sync.WaitGroup{}
 
-	wg.Add(tablesCount)
+	wg.Add(tablesCount - tablesWithForeignKeys)
 
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
+	errs, _ := errgroup.WithContext(context.TODO())
 
-		if err := fillUsersBulkLoad(db, count); err != nil {
-			log.Fatal(err)
-		}
-	}(wg)
+	errs.Go(func() error {
+		return fillUsersBulkLoad(db, count)
+	})
 
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
+	errs.Go(func() error {
+		return fillAuthorBulkLoad(db, count)
+	})
 
-		if err := fillAuthorBulkLoad(db, count); err != nil {
-			log.Fatal(err)
-		}
-	}(wg)
+	errs.Go(func() error {
+		return fillBookBulkLoad(db, count)
+	})
 
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
+	if err := errs.Wait(); err != nil {
+		log.Fatal(err)
+	}
 
-		if err := fillBookBulkLoad(db, count); err != nil {
-			log.Fatal(err)
-		}
-	}(wg)
+	if err := fillBookCopyBulkLoad(db, count); err != nil {
+		log.Fatal(err)
+	}
 
-	wg.Wait()
+	if err := fillBookAuthorBulkLoad(db, count); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := fillHistoryBulkLoad(db, count); err != nil {
+		log.Fatal(err)
+	}
 
 	log.Print("Time elapsed to fill data: ", time.Since(start))
 
@@ -56,7 +65,7 @@ func FillLibraryDB(db *sql.DB, count int) error {
 }
 
 func fillUsersBulkLoad(db *sql.DB, count int) error {
-	const query = "INSERT INTO library_user(id, username, email, password) VALUES %s;"
+	const query = "INSERT INTO library_user(username, email, password) VALUES %s;"
 
 	values := make([]string, 0, count)
 
@@ -64,9 +73,8 @@ func fillUsersBulkLoad(db *sql.DB, count int) error {
 		username := faker.Username()
 		email := faker.Email()
 		password := security.Hash(faker.Password())
-		id := security.Hash(email)
 
-		values = append(values, fmt.Sprintf("('%s', '%s', '%s', '%s')", id, username, email, password))
+		values = append(values, fmt.Sprintf("('%s', '%s', '%s')", username, email, password))
 	}
 
 	valuesStr := strings.Join(values, ", ")
@@ -110,6 +118,79 @@ func fillBookBulkLoad(db *sql.DB, count int) error {
 		releaseDate := faker.Date()
 
 		values = append(values, fmt.Sprintf("('%s', '%s')", title, releaseDate))
+	}
+
+	valuesStr := strings.Join(values, ", ")
+
+	if _, err := db.Exec(fmt.Sprintf(query, valuesStr)); err != nil {
+		log.Fatal(err)
+	}
+
+	return nil
+}
+
+func fillBookCopyBulkLoad(db *sql.DB, count int) error {
+	const query = "INSERT INTO book_copy(book_id) VALUES %s;"
+
+	values := make([]string, 0, count)
+
+	for i := 0; i < count; i++ {
+		bookID := rand.Intn(count) + 1
+
+		values = append(values, fmt.Sprintf("('%d')", bookID))
+	}
+
+	valuesStr := strings.Join(values, ", ")
+
+	if _, err := db.Exec(fmt.Sprintf(query, valuesStr)); err != nil {
+		log.Fatal(err)
+	}
+
+	return nil
+}
+
+func fillBookAuthorBulkLoad(db *sql.DB, count int) error {
+	const query = "INSERT INTO book_author(book_id, author_id) VALUES %s;"
+
+	values := make([]string, 0, count)
+
+	for i := 0; i < count; i++ {
+		bookID := rand.Intn(count) + 1
+		authorID := rand.Intn(count) + 1
+
+		values = append(values, fmt.Sprintf("('%d', '%d')", bookID, authorID))
+	}
+
+	valuesStr := strings.Join(values, ", ")
+
+	if _, err := db.Exec(fmt.Sprintf(query, valuesStr)); err != nil && err.Error() != `pq: duplicate key value violates unique constraint "book_author_id"` {
+		fmt.Println(err.Error())
+	}
+
+	return nil
+}
+
+func fillHistoryBulkLoad(db *sql.DB, count int) error {
+	const query = "INSERT INTO history(library_user_id, book_copy_id, date_from, date_to) VALUES %s;"
+
+	values := make([]string, 0, count)
+
+	for i := 0; i < count; i++ {
+		userID := rand.Intn(count) + 1
+		bookCopyID := rand.Intn(count) + 1
+		dateFrom := time.Unix(rand.Int63n(time.Now().Unix()), 0)
+		dateTo := time.Unix(rand.Int63n(time.Now().Unix()), 0)
+
+		if dateTo.Before(dateFrom) {
+			tmp := dateFrom
+			dateFrom = dateTo
+			dateTo = tmp
+		}
+
+		dateFromStr := dateFrom.Format(baseDateFormat)
+		dateToStr := dateTo.Format(baseDateFormat)
+
+		values = append(values, fmt.Sprintf("('%d', '%d', '%s', '%s')", userID, bookCopyID, dateFromStr, dateToStr))
 	}
 
 	valuesStr := strings.Join(values, ", ")

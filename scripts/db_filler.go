@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	count        = 1000000
+	count        = 1000
 	maxOpenConns = 1000
 )
 
