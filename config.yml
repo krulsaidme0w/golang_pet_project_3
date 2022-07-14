@@ -7,4 +7,4 @@ psql:
   sslmode: "disable"
 
 auth:
-  
+  hash

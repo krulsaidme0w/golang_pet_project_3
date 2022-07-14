@@ -1,8 +1,10 @@
 package repository
 
-import "krulsaidme0w/library/internal/domain/entity"
+import (
+	"krulsaidme0w/library/internal/domain/entity"
+)
 
-type User interface {
+type UserRepository interface {
 	Save(user *entity.User) error
 	Get(userID string) (*entity.User, error)
 	Update(user *entity.User) error
