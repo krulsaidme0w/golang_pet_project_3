@@ -1,10 +1,12 @@
 package user
 
-import "krulsaidme0w/library/internal/domain/entity"
+import (
+	"github.com/krulsaidme0w/golang_pet_project_3/internal/models"
+)
 
 type UseCase interface {
-	Save(userRequest *entity.UserRequest) error
-	Get(userID string) (*entity.User, error)
-	Update(user entity.User, updatedUser entity.UserRequest) error
-	Delete(userID string) error
+	Save(userRequest *models.UserRequest) error
+	Get(id string) (*models.User, error)
+	Update(user models.User, updatedUser models.UserRequest) error
+	Delete(id string) error
 }

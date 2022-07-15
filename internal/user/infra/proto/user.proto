@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/krulsaidme0w/golang_pet_project_3/internal/user/infra/proto/user.proto";
+
+import "google/protobuf/empty.proto";
+
+message User {
+  uint64 id = 1;
+  string username = 2;
+  string email = 3;
+  string password = 4;
+};
+
+message UserID {
+  uint64 id = 1;
+}
+
+message Empty {}
+
+service UserUseCase {
+    rpc Save(User) returns(google.protobuf.Empty) {}
+    rpc Get(UserID) returns(User) {}
+    rpc Update(User) returns(google.protobuf.Empty) {}
+    rpc Delete(UserID) returns(google.protobuf.Empty) {}
+}

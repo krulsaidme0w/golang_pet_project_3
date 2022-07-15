@@ -1,10 +1,12 @@
 package user
 
-import "krulsaidme0w/library/internal/domain/entity"
+import (
+	"github.com/krulsaidme0w/golang_pet_project_3/internal/models"
+)
 
-type UserRepository interface {
-	Save(user *entity.User) error
-	Get(userID string) (*entity.User, error)
-	Update(user *entity.User) error
-	Delete(userID string) error
+type Repository interface {
+	Save(user *models.User) error
+	Get(id string) (*models.User, error)
+	Update(user *models.User) error
+	Delete(id string) error
 }
