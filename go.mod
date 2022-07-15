@@ -1,4 +1,4 @@
-module krulsaidme0w/library
+module github.com/krulsaidme0w/golang_pet_project_3
 
 go 1.18
 

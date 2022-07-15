@@ -5,6 +5,3 @@ psql:
   password: "password"
   dbname: "library"
   sslmode: "disable"
-
-auth:
-  hash
