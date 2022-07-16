@@ -1,7 +1,0 @@
-psql:
-  host: "localhost"
-  port: "5432"
-  user: "user"
-  password: "password"
-  dbname: "library"
-  sslmode: "disable"

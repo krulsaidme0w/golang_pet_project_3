@@ -1,4 +1,4 @@
-package models
+package userservice
 
 type User struct {
 	ID       int64  `json:"user_id"`

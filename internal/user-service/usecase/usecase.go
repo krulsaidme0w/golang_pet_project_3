@@ -1,7 +1,7 @@
-package user
+package usecase
 
 import (
-	"github.com/krulsaidme0w/golang_pet_project_3/internal/user/repository"
+	"github.com/krulsaidme0w/golang_pet_project_3/internal/user-service/repository"
 )
 
 type userUseCase struct {

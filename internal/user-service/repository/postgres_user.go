@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 
-	"github.com/krulsaidme0w/golang_pet_project_3/internal/models"
+	userservice "github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service"
 )
 
 type UserRepository struct {
@@ -16,7 +16,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	}
 }
 
-func (r *UserRepository) Save(user *models.User) error {
+func (r *UserRepository) Save(user *userservice.User) error {
 	query := `
 		INSERT INTO library_user(username, email, password) 
 		VALUES ($1, $2, $3)`
@@ -26,7 +26,7 @@ func (r *UserRepository) Save(user *models.User) error {
 	return err
 }
 
-func (r *UserRepository) Get(id string) (*models.User, error) {
+func (r *UserRepository) Get(id string) (*userservice.User, error) {
 	query := `
 		SELECT id, username, email, password
 		FROM library_user
@@ -34,7 +34,7 @@ func (r *UserRepository) Get(id string) (*models.User, error) {
 
 	row := r.DB.QueryRow(query, id)
 
-	user := &models.User{}
+	user := &userservice.User{}
 	if err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password); err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (r *UserRepository) Get(id string) (*models.User, error) {
 	return user, nil
 }
 
-func (r *UserRepository) Update(user *models.User) error {
+func (r *UserRepository) Update(user *userservice.User) error {
 	query := `
 		UPDATE library_user
 		SET username = $1, email = $2, password = $3,
