@@ -1,12 +1,14 @@
 package userservice
 
 import (
-	userservice "github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service"
+	"context"
+
+	"github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service/models"
 )
 
-type Repository interface {
-	Save(user *userservice.User) error
-	Get(id string) (*userservice.User, error)
-	Update(user *userservice.User) error
-	Delete(id string) error
+type UserRepository interface {
+	Save(ctx context.Context, user *models.User) error
+	Get(ctx context.Context, id string) (*models.User, error)
+	Update(ctx context.Context, user *models.User) error
+	Delete(ctx context.Context, id string) error
 }

@@ -1,8 +1,8 @@
 CREATE TABLE library_user
 (
   id SERIAL PRIMARY KEY,
-  username VARCHAR(20) NOT NULL,
-  email VARCHAR(20) NOT NULL,
+  username VARCHAR(64) NOT NULL,
+  email VARCHAR(64) NOT NULL,
   password VARCHAR(256) NOT NULL
 );
 

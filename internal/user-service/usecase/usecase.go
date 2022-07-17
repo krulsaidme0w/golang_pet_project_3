@@ -1,15 +1,48 @@
 package usecase
 
 import (
-	"github.com/krulsaidme0w/golang_pet_project_3/internal/user-service/repository"
+	"context"
+
+	userservice "github.com/krulsaidme0w/golang_pet_project_3/internal/user-service"
+	"github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service/models"
 )
 
 type userUseCase struct {
-	repository repository.UserRepository
+	repository userservice.UserRepository
 }
 
-func NewUserUseCase(repository repository.UserRepository) *userUseCase {
+func NewUserUseCase(repository userservice.UserRepository) *userUseCase {
 	return &userUseCase{
 		repository: repository,
 	}
+}
+
+func (u *userUseCase) Save(ctx context.Context, userRequest *models.UserRequest) error {
+	user, err := userRequest.ToUser()
+	if err != nil {
+		return err
+	}
+
+	return u.repository.Save(ctx, user)
+}
+
+func (u *userUseCase) Get(ctx context.Context, id string) (*models.User, error) {
+	return u.repository.Get(ctx, id)
+}
+
+func (u *userUseCase) Update(ctx context.Context, user *models.User, updatedUser *models.UserRequest) error {
+	userID := user.ID
+
+	user, err := updatedUser.ToUser()
+	if err != nil {
+		return err
+	}
+
+	user.ID = userID
+
+	return u.repository.Update(ctx, user)
+}
+
+func (u *userUseCase) Delete(ctx context.Context, id string) error {
+	return u.repository.Delete(ctx, id)
 }
