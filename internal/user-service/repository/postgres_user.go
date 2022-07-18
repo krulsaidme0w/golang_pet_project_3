@@ -27,7 +27,7 @@ func (r *UserRepository) Save(ctx context.Context, user *models.User) error {
 	return err
 }
 
-func (r *UserRepository) Get(ctx context.Context, id string) (*models.User, error) {
+func (r *UserRepository) Get(ctx context.Context, id uint64) (*models.User, error) {
 	query := `
 		SELECT id, username, email, password
 		FROM library_user
@@ -54,7 +54,7 @@ func (r *UserRepository) Update(ctx context.Context, user *models.User) error {
 	return err
 }
 
-func (r *UserRepository) Delete(ctx context.Context, id string) error {
+func (r *UserRepository) Delete(ctx context.Context, id uint64) error {
 	query := `
 		DELETE FROM library_user
 		WHERE id = $1`

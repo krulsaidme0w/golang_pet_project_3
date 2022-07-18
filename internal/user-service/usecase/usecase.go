@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	userservice "github.com/krulsaidme0w/golang_pet_project_3/internal/user-service"
+	userservice "github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service"
 	"github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service/models"
 )
 
@@ -26,7 +26,7 @@ func (u *userUseCase) Save(ctx context.Context, userRequest *models.UserRequest)
 	return u.repository.Save(ctx, user)
 }
 
-func (u *userUseCase) Get(ctx context.Context, id string) (*models.User, error) {
+func (u *userUseCase) Get(ctx context.Context, id uint64) (*models.User, error) {
 	return u.repository.Get(ctx, id)
 }
 
@@ -43,6 +43,6 @@ func (u *userUseCase) Update(ctx context.Context, user *models.User, updatedUser
 	return u.repository.Update(ctx, user)
 }
 
-func (u *userUseCase) Delete(ctx context.Context, id string) error {
+func (u *userUseCase) Delete(ctx context.Context, id uint64) error {
 	return u.repository.Delete(ctx, id)
 }

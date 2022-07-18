@@ -5,9 +5,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	userservice "github.com/krulsaidme0w/golang_pet_project_3/internal/user-service"
 	"github.com/krulsaidme0w/golang_pet_project_3/pkg/context"
 	"github.com/krulsaidme0w/golang_pet_project_3/pkg/httputil"
+	userservice "github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service"
 	"github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service/models"
 )
 
