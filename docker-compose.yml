@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: "library"
+      POSTGRES_USER: "user"
+      POSTGRES_HOST: "localhost"
+      POSTGRES_PASSWORD: "password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./init/database.init:/docker-entrypoint-initdb.d/create_tables.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - library
+
+  redis:
+    image: "redis:alpine"
+    hostname: redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - library
+
+networks:
+  library:
+    name: library
