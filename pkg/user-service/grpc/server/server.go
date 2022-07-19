@@ -5,6 +5,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/krulsaidme0w/golang_pet_project_3/pkg/security"
 	userservice "github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service"
 	proto "github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service/grpc/proto"
 	"github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service/models"
@@ -37,7 +38,10 @@ func (u *userService) Get(ctx context.Context, id *proto.UserID) (*proto.User, e
 }
 
 func (u *userService) Update(ctx context.Context, user *proto.User) (*emptypb.Empty, error) {
-	err := u.userRepo.Update(ctx, getUserForRepo(user))
+	userForRepo := getUserForRepo(user)
+	userForRepo.Password = security.Hash(userForRepo.Password)
+
+	err := u.userRepo.Update(ctx, userForRepo)
 
 	return &emptypb.Empty{}, err
 }

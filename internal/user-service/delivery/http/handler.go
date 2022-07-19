@@ -1,7 +1,8 @@
-package userHttp
+package http
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -11,14 +12,15 @@ import (
 	"github.com/krulsaidme0w/golang_pet_project_3/pkg/user-service/models"
 )
 
-type Handler struct {
+type UserHandler struct {
 	userUseCase userservice.UserUseCase
-	adapter     httputil.HttpFrameworkAdapter
+	adapter     *httputil.FiberFrameworkAdapter
 }
 
-func NewUserHandler(userUseCase userservice.UserUseCase) *Handler {
-	return &Handler{
+func NewUserHandler(userUseCase userservice.UserUseCase, adapter *httputil.FiberFrameworkAdapter) *UserHandler {
+	return &UserHandler{
 		userUseCase: userUseCase,
+		adapter:     adapter,
 	}
 }
 
@@ -32,7 +34,7 @@ func NewUserHandler(userUseCase userservice.UserUseCase) *Handler {
 // @Success      200  {object}  httputil.ReturnType
 // @Failure      400  {object}  httputil.Error  "Cannot save user"
 // @Router 		 /user [post]
-func (h *Handler) SaveUser(c *fiber.Ctx) error {
+func (h *UserHandler) SaveUser(c *fiber.Ctx) error {
 	ctx, cancel := context.InitContext()
 	defer cancel()
 
@@ -67,13 +69,19 @@ func (h *Handler) SaveUser(c *fiber.Ctx) error {
 // @Success      200  {object}  models.User
 // @Failure      400  {object}  httputil.Error  "User not found"
 // @Router 		 /user/{id} [get]
-func (h *Handler) GetUser(c *fiber.Ctx) error {
+func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 	ctx, cancel := context.InitContext()
 	defer cancel()
 
 	userID := c.Params("id")
 
-	user, err := h.userUseCase.Get(ctx, userID)
+	id, err := strconv.ParseUint(userID, 10, 64)
+	if err != nil {
+		h.adapter.Error(c, http.StatusBadRequest, err)
+		return nil
+	}
+
+	user, err := h.userUseCase.Get(ctx, id)
 	if err != nil {
 		h.adapter.Error(c, http.StatusBadRequest, err)
 		return nil
@@ -90,22 +98,27 @@ func (h *Handler) GetUser(c *fiber.Ctx) error {
 // @Tags         user
 // @Accept       application/json
 // @Produce      application/json
-// @Param 		 data  body 	models.UserRequest true "user request"
+// @Param 		 data  body 	models.User true "updated user"
 // @Success      200  {object}  httputil.ReturnType
 // @Failure      400  {object}  httputil.Error  "Cannot update user"
-// @Router 		 /user [patch]
-func (h *Handler) UpdateUser(c *fiber.Ctx) error {
+// @Router 		 /user/update [post]
+func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	ctx, cancel := context.InitContext()
 	defer cancel()
 
-	userRequest := new(models.UserRequest)
+	user := new(models.User)
 
-	if err := h.adapter.GetPostBody(c, &userRequest); err != nil {
+	if err := h.adapter.GetPostBody(c, &user); err != nil {
 		h.adapter.Error(c, http.StatusBadRequest, err)
 		return nil
 	}
 
-	err := h.userUseCase.Update(ctx, nil, userRequest)
+	if _, err := h.userUseCase.Get(ctx, user.ID); err != nil {
+		h.adapter.Error(c, http.StatusBadRequest, err)
+		return nil
+	}
+
+	err := h.userUseCase.Update(ctx, user)
 	if err != nil {
 		h.adapter.Error(c, http.StatusBadRequest, err)
 		return nil
@@ -129,13 +142,19 @@ func (h *Handler) UpdateUser(c *fiber.Ctx) error {
 // @Success      200  {object}  models.User
 // @Failure      400  {object}  httputil.Error  "User not found"
 // @Router 		 /user/{id} [delete]
-func (h *Handler) DeleteUser(c *fiber.Ctx) error {
+func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	ctx, cancel := context.InitContext()
 	defer cancel()
 
 	userID := c.Params("id")
 
-	err := h.userUseCase.Delete(ctx, userID)
+	id, err := strconv.ParseUint(userID, 10, 64)
+	if err != nil {
+		h.adapter.Error(c, http.StatusBadRequest, err)
+		return nil
+	}
+
+	err = h.userUseCase.Delete(ctx, id)
 	if err != nil {
 		h.adapter.Error(c, http.StatusBadRequest, err)
 		return nil

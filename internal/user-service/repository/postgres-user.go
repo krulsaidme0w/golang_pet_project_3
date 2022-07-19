@@ -46,7 +46,7 @@ func (r *UserRepository) Get(ctx context.Context, id uint64) (*models.User, erro
 func (r *UserRepository) Update(ctx context.Context, user *models.User) error {
 	query := `
 		UPDATE library_user
-		SET username = $1, email = $2, password = $3,
+		SET username = $1, email = $2, password = $3
 		WHERE id = $4`
 
 	_, err := r.DB.Exec(query, user.Username, user.Email, user.Password, user.ID)
